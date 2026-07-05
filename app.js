@@ -562,4 +562,77 @@ function init() {
   });
 }
 
+/* -------------------- ANTI-COPY PROTECTION -------------------- */
+(function() {
+  // 1. Disable Right Click
+  document.addEventListener('contextmenu', e => e.preventDefault());
+
+  // 2. Disable Key Shortcuts (Ctrl+C, Ctrl+U, Ctrl+S, F12 / Ctrl+Shift+I)
+  document.addEventListener('keydown', function(e) {
+    if (
+      e.keyCode === 123 || // F12
+      e.keyCode === 44  || // PrintScreen
+      (e.ctrlKey && e.shiftKey && e.keyCode === 73) || // Ctrl+Shift+I (DevTools)
+      (e.ctrlKey && e.shiftKey && e.keyCode === 74) || // Ctrl+Shift+J (DevTools Console)
+      (e.ctrlKey && e.keyCode === 85) || // Ctrl+U (View Source)
+      (e.ctrlKey && e.keyCode === 83) || // Ctrl+S (Save)
+      (e.ctrlKey && e.keyCode === 67)    // Ctrl+C (Copy)
+    ) {
+      e.preventDefault();
+      showToast('error', '⚠️ Proteksi: Konten dan kode halaman dilindungi!');
+      return false;
+    }
+  });
+
+  // 2b. Block PrintScreen Clipboard copy (Clear clipboard when focus is lost or keyup detected)
+  document.addEventListener('keyup', function(e) {
+    if (e.keyCode === 44) {
+      navigator.clipboard.writeText('');
+      showToast('error', '⚠️ Screenshot Dilarang: Clipboard telah dikosongkan!');
+    }
+  });
+
+  // 2c. Blur page when window loses focus or page visibility changes (Snipping tool, OS Multitasking tab switcher on Android/iOS)
+  const applyBlur = () => {
+    document.body.style.filter = 'blur(15px)';
+    document.body.style.transition = 'filter 0.1s ease';
+  };
+
+  const removeBlur = () => {
+    document.body.style.filter = 'none';
+  };
+
+  window.addEventListener('blur', applyBlur);
+  window.addEventListener('focus', removeBlur);
+  document.addEventListener('visibilitychange', function() {
+    if (document.hidden) {
+      applyBlur();
+    } else {
+      removeBlur();
+    }
+  });
+
+  // 3. Prevent DevTools Inspection using Debugger loop & detection
+  function preventDevTools() {
+    // debugger trick to pause browser execution if DevTools is open
+    setInterval(function() {
+      const startTime = +new Date();
+      debugger;
+      const endTime = +new Date();
+      if (endTime - startTime > 100) {
+        document.body.innerHTML = `
+          <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; background:#0F172A; color:#F8FAFC; font-family:sans-serif; text-align:center; padding:20px;">
+            <h1 style="color:#EF4444; font-size:32px; margin-bottom:12px;">Akses Ditolak!</h1>
+            <p style="color:#94A3B8; font-size:16px;">DevTools terdeteksi aktif. Silakan tutup Developer Tools Anda untuk melihat halaman ini.</p>
+          </div>
+        `;
+      }
+    }, 500);
+  }
+
+  // Run protection
+  preventDevTools();
+})();
+
 document.addEventListener('DOMContentLoaded', init);
+
