@@ -42,6 +42,19 @@ function toggleSidebar() {
   }
 }
 
+// Close mobile sidebar when clicking outside
+document.addEventListener('click', function(e) {
+  const sidebar = document.getElementById('sidebar');
+  const toggleBtn = document.getElementById('sidebarToggle');
+  
+  if (sidebar && sidebar.classList.contains('mobile-open')) {
+    // If click is not inside sidebar and not on the toggle button
+    if (!sidebar.contains(e.target) && (!toggleBtn || !toggleBtn.contains(e.target))) {
+      sidebar.classList.remove('mobile-open');
+    }
+  }
+});
+
 /* -------------------- NAV ACTIVE -------------------- */
 document.querySelectorAll('.nav-item').forEach(item => {
   item.addEventListener('click', function(e) {

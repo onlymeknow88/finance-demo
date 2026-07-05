@@ -23,6 +23,23 @@
       box-shadow: var(--card-shadow);
     }
 
+    @media (max-width: 768px) {
+      .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .filter-group {
+        width: 100%;
+      }
+      .filter-control {
+        width: 100% !important;
+      }
+      .btn-reset-filters {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
     .filter-group {
       display: flex;
       flex-direction: column;

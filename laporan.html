@@ -26,6 +26,15 @@
     .report-type-tabs {
       display: flex;
       gap: 8px;
+      overflow-x: auto;
+      width: 100%;
+      -webkit-overflow-scrolling: touch;
+    }
+    .report-type-tabs::-webkit-scrollbar {
+      height: 2px;
+    }
+    .report-type-tabs::-webkit-scrollbar-thumb {
+      background: var(--border);
     }
 
     .report-type-tab {
