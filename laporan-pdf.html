@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>FinanceTrack — Cetak Laporan Keuangan</title>
+  <style>
+    /* Styling khusus cetak PDF standard agar rapi dan profesional saat di-print */
+    body {
+      font-family: 'Inter', Arial, sans-serif;
+      color: #111827;
+      background: #ffffff;
+      margin: 0;
+      padding: 40px;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .pdf-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 2px solid #111827;
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+    }
+
+    .company-title {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin: 0;
+    }
+
+    .company-sub {
+      font-size: 11px;
+      color: #4B5563;
+      margin-top: 4px;
+    }
+
+    .report-title {
+      text-align: right;
+    }
+
+    .report-title h1 {
+      font-size: 18px;
+      font-weight: 700;
+      margin: 0;
+      color: #4F46E5;
+    }
+
+    .report-title p {
+      font-size: 11px;
+      color: #4B5563;
+      margin-top: 4px;
+    }
+
+    .summary-boxes {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+
+    .summary-box {
+      border: 1px solid #D1D5DB;
+      border-radius: 8px;
+      padding: 12px 16px;
+    }
+
+    .summary-box-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: #6B7280;
+      text-transform: uppercase;
+    }
+
+    .summary-box-value {
+      font-size: 16px;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+
+    .pdf-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+    }
+
+    .pdf-table tr.header {
+      background: #F3F4F6;
+      font-weight: 700;
+    }
+
+    .pdf-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #E5E7EB;
+    }
+
+    .pdf-table td.indent {
+      padding-left: 30px;
+    }
+
+    .pdf-table td.amount {
+      text-align: right;
+      font-weight: 600;
+    }
+
+    .pdf-table tr.total-row {
+      font-weight: 700;
+      background: #F9FAFB;
+    }
+
+    .pdf-table tr.final-row {
+      font-weight: 800;
+      font-size: 13px;
+      background: #EEF2F6;
+    }
+
+    .pdf-table tr.final-row td {
+      border-top: 2px solid #4F46E5;
+      border-bottom: 2px solid #4F46E5;
+      color: #4F46E5;
+    }
+
+    .footer-note {
+      margin-top: 50px;
+      font-size: 10px;
+      color: #9CA3AF;
+      text-align: center;
+      border-top: 1px solid #E5E7EB;
+      padding-top: 15px;
+    }
+
+    .no-print-bar {
+      background: #111827;
+      color: #ffffff;
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: -40px -40px 40px -40px;
+    }
+
+    .btn-print {
+      background: #4F46E5;
+      color: #ffffff;
+      border: none;
+      padding: 8px 16px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .btn-print:hover {
+      background: #4338CA;
+    }
+
+    @media print {
+      .no-print-bar {
+        display: none;
+      }
+      body {
+        padding: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Toolbar Atas (Tidak akan ikut tercetak) -->
+  <div class="no-print-bar">
+    <span>📄 Preview Cetak PDF Laporan Laba Rugi</span>
+    <button class="btn-print" onclick="window.print()">Cetak / Simpan ke PDF</button>
+  </div>
+
+  <div class="pdf-header">
+    <div>
+      <div class="company-title">FinanceTrack</div>
+      <div class="company-sub">Sistem Reporting Keuangan Usaha Baru</div>
+    </div>
+    <div class="report-title">
+      <h1>LAPORAN LABA RUGI SEDERHANA</h1>
+      <p>Periode: 01 Juni 2026 - 31 Juli 2026</p>
+    </div>
+  </div>
+
+  <div class="summary-boxes">
+    <div class="summary-box">
+      <div class="summary-box-label">Total Pendapatan</div>
+      <div class="summary-box-value" style="color: #16A34A;">Rp 245.750.000</div>
+    </div>
+    <div class="summary-box">
+      <div class="summary-box-label">Total Beban Operasional</div>
+      <div class="summary-box-value" style="color: #DC2626;">Rp 178.320.000</div>
+    </div>
+    <div class="summary-box">
+      <div class="summary-box-label">Laba Bersih</div>
+      <div class="summary-box-value" style="color: #4F46E5;">Rp 67.430.000</div>
+    </div>
+  </div>
+
+  <table class="pdf-table">
+    <tr class="header">
+      <td>Deskripsi Komponen Keuangan</td>
+      <td style="text-align: right;">Jumlah (Rp)</td>
+    </tr>
+    <tr style="font-weight: 600;">
+      <td>PENDAPATAN USAHA</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td class="indent">Pendapatan Penjualan Langsung</td>
+      <td class="amount">210.750.000</td>
+    </tr>
+    <tr>
+      <td class="indent">Pendapatan Jasa Konsultasi</td>
+      <td class="amount">35.000.000</td>
+    </tr>
+    <tr class="total-row">
+      <td>TOTAL PENDAPATAN (A)</td>
+      <td class="amount">245.750.000</td>
+    </tr>
+
+    <tr style="font-weight: 600;">
+      <td>BEBAN PENGELUARAN</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td class="indent">Beban Gaji & Upah Karyawan</td>
+      <td class="amount">32.000.000</td>
+    </tr>
+    <tr>
+      <td class="indent">Beban Pemasaran & Iklan digital</td>
+      <td class="amount">38.450.000</td>
+    </tr>
+    <tr>
+      <td class="indent">Beban Sewa Gudang & Daya Listrik</td>
+      <td class="amount">18.750.000</td>
+    </tr>
+    <tr>
+      <td class="indent">Beban Alat Tulis Kantor & Operasional Harian</td>
+      <td class="amount">64.250.000</td>
+    </tr>
+    <tr>
+      <td class="indent">Beban Transportasi & Bahan Bakar</td>
+      <td class="amount">12.300.000</td>
+    </tr>
+    <tr>
+      <td class="indent">Beban Lain-Lain</td>
+      <td class="amount">12.570.000</td>
+    </tr>
+    <tr class="total-row">
+      <td>TOTAL PENGELUARAN BEBAN (B)</td>
+      <td class="amount">178.320.000</td>
+    </tr>
+
+    <tr class="final-row">
+      <td>LABA BERSIH OPERASIONAL (A - B)</td>
+      <td class="amount">67.430.000</td>
+    </tr>
+  </table>
+
+  <div style="margin-top: 40px; display: flex; justify-content: flex-end;">
+    <div style="text-align: center; width: 200px;">
+      <p>Jakarta, 05 Juli 2026</p>
+      <p style="margin-top: 60px; font-weight: 700; text-decoration: underline;">John Doe</p>
+      <p style="color: #6B7280; margin-top: 4px;">Owner / Direktur Utama</p>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    Laporan ini di-generate secara otomatis oleh Sistem Reporting Keuangan FinanceTrack pada 05 Juli 2026 23:47 WIB.
+  </div>
+
+</body>
+</html>

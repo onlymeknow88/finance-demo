@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FinanceTrack — Import Transaksi Excel/CSV</title>
+  <meta name="description" content="Sistem Reporting Keuangan — Halaman upload dan import data transaksi Excel/CSV." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Styling tambahan khusus halaman Import Excel/CSV agar modern & visual */
+    .import-container {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 24px;
+    }
+    
+    .import-main-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 32px;
+      box-shadow: var(--card-shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    
+    .instructions-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 24px;
+      box-shadow: var(--card-shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .instructions-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .instructions-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      list-style: none;
+      padding: 0;
+    }
+
+    .instructions-list li {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      position: relative;
+      padding-left: 20px;
+    }
+
+    .instructions-list li::before {
+      content: "•";
+      color: var(--primary);
+      font-weight: bold;
+      font-size: 18px;
+      position: absolute;
+      left: 0;
+      top: 0;
+      line-height: 1.2;
+    }
+
+    .big-upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-card);
+      padding: 48px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: all 0.2s ease;
+      background: rgba(99, 102, 241, 0.02);
+    }
+
+    .big-upload-zone:hover {
+      border-color: var(--primary);
+      background: rgba(99, 102, 241, 0.05);
+      transform: translateY(-2px);
+    }
+
+    .big-upload-zone svg {
+      color: var(--primary);
+      transition: transform 0.2s ease;
+    }
+    
+    .big-upload-zone:hover svg {
+      transform: translateY(-4px);
+    }
+
+    .upload-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .upload-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    .btn-download-template {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-btn);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s;
+      width: 100%;
+    }
+
+    .btn-download-template:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: rgba(99, 102, 241, 0.04);
+    }
+
+    /* Table mapping / preview */
+    .preview-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--border);
+      padding-top: 24px;
+    }
+
+    .preview-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .preview-badge {
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(99, 102, 241, 0.15);
+      color: var(--primary);
+    }
+
+    .validation-summary {
+      background: rgba(34, 197, 94, 0.08);
+      border: 1px solid rgba(34, 197, 94, 0.2);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .validation-summary.error {
+      background: rgba(239, 68, 68, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .validation-text {
+      font-size: 13px;
+      color: var(--text-primary);
+    }
+
+    .validation-text span {
+      font-weight: 700;
+    }
+
+    .btn-import-execute {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, var(--primary), #818CF8);
+      border: none;
+      color: white;
+      border-radius: var(--radius-btn);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(99,102,241,0.3);
+      transition: all 0.2s ease;
+      align-self: flex-end;
+    }
+
+    .btn-import-execute:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(99,102,241,0.45);
+    }
+
+    .btn-import-execute:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    @media (max-width: 1024px) {
+      .import-container {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===================== SIDEBAR ===================== -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+      </svg>
+    </div>
+    <div class="logo-text">
+      <span class="logo-title">FinanceTrack</span>
+      <span class="logo-sub">Income & Expense Tracker</span>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a href="index.html" class="nav-item" id="nav-dashboard">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+
+    <div class="nav-section-label">TRANSAKSI</div>
+    <a href="transaksi.html" class="nav-item" id="nav-transaksi">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Transaksi
+    </a>
+    <a href="#" class="nav-item" id="nav-tambah">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      Tambah Transaksi
+    </a>
+    <a href="template.html" class="nav-item" id="nav-template">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 6v12"/><path d="M8 10h8"/><path d="M8 14h8"/></svg>
+      Template Berulang
+    </a>
+    <a href="import.html" class="nav-item active" id="nav-import">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Import Excel/CSV
+    </a>
+
+    <div class="nav-section-label">MASTER DATA</div>
+    <a href="kategori.html" class="nav-item" id="nav-kategori">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+      Kategori
+    </a>
+    <a href="project.html" class="nav-item" id="nav-project">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      Project
+    </a>
+    <a href="budget.html" class="nav-item" id="nav-budget">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      Budget
+    </a>
+
+    <div class="nav-section-label">LAPORAN</div>
+    <a href="laporan.html" class="nav-item" id="nav-laporan">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Laporan
+    </a>
+    <a href="#" class="nav-item" id="nav-export">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export PDF/Excel
+    </a>
+
+    <div class="nav-section-label">PENGATURAN</div>
+    <a href="#" class="nav-item" id="nav-pengguna">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Pengguna
+    </a>
+    <a href="#" class="nav-item" id="nav-pengaturan">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Pengaturan
+    </a>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <div class="dark-mode-toggle">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <span>Dark Mode</span>
+      <div class="toggle-switch active" id="themeToggle" onclick="toggleTheme()">
+        <div class="toggle-thumb"></div>
+      </div>
+    </div>
+    <div class="sidebar-profile">
+      <div class="avatar">JD</div>
+      <div class="profile-info">
+        <span class="profile-name">John Doe</span>
+        <span class="profile-role">Owner</span>
+      </div>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+  </div>
+</aside>
+
+<!-- ===================== MAIN CONTENT ===================== -->
+<div class="main-wrapper">
+
+  <!-- HEADER -->
+  <header class="topbar" id="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" aria-label="Toggle Sidebar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="project-switcher" id="projectSwitcher">
+        <span>Semua Project</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        <div class="project-dropdown" id="projectDropdown">
+          <div class="dropdown-item active">Semua Project</div>
+          <div class="dropdown-item">Project Alpha</div>
+          <div class="dropdown-item">Project Beta</div>
+          <div class="dropdown-item">Project Gamma</div>
+          <div class="dropdown-item">Project Delta</div>
+          <div class="dropdown-item">Project Epsilon</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="topbar-search" id="globalSearchBar" onclick="openSearch()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <span>Cari transaksi, kategori, project...</span>
+      <kbd>Ctrl + K</kbd>
+    </div>
+
+    <div class="topbar-right">
+      <button class="icon-btn notif-btn" id="notifBtn" aria-label="Notifikasi">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="badge">3</span>
+      </button>
+      <button class="icon-btn" id="helpBtn" aria-label="Bantuan">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </button>
+      <div class="header-avatar" id="headerAvatar">JD</div>
+    </div>
+  </header>
+
+  <!-- PAGE CONTENT -->
+  <main class="content" id="mainContent">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Import Transaksi</h1>
+        <p class="page-sub">Upload bulk data transaksi Excel/CSV dengan validasi otomatis mapping</p>
+      </div>
+    </div>
+
+    <div class="import-container">
+      
+      <!-- Upload area & Preview -->
+      <div class="import-main-card">
+        <div class="big-upload-zone" id="bigUploadZone" onclick="document.getElementById('importFile').click()">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <span class="upload-title">Pilih file Excel atau CSV Anda</span>
+          <span class="upload-desc">Drag & drop file ke sini, atau klik untuk menelusuri dari komputer Anda<br/><small>(Maksimal ukuran file 10MB)</small></span>
+          <input type="file" id="importFile" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleFileSelected(this)" />
+        </div>
+
+        <!-- Preview Section (Hidden initially, shown after file selected) -->
+        <div id="previewContainer" style="display: none; flex-direction: column; gap: 20px;">
+          
+          <div class="validation-summary" id="validationSummary">
+            <span class="toast-icon">✅</span>
+            <div class="validation-text">
+              File <span id="fileNameDisplay">data_transaksi.xlsx</span> berhasil di-upload. Terdeteksi <span id="validRowsCount">0</span> baris data valid dan siap di-import.
+            </div>
+          </div>
+
+          <div class="preview-header">
+            <h3 class="preview-title">Preview Data Transaksi</h3>
+            <span class="preview-badge" id="previewRowBadge">0 Baris</span>
+          </div>
+
+          <div class="table-wrap">
+            <table class="tx-table">
+              <thead>
+                <tr>
+                  <th>Tanggal</th>
+                  <th>Deskripsi</th>
+                  <th>Project</th>
+                  <th>Kategori</th>
+                  <th>Tipe</th>
+                  <th>Nominal</th>
+                  <th>Status Validasi</th>
+                </tr>
+              </thead>
+              <tbody id="previewTableBody">
+                <!-- Rows will be injected by JavaScript -->
+              </tbody>
+            </table>
+          </div>
+
+          <button class="btn-import-execute" id="btnImportExecute" onclick="executeImport()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Proses Import Sekarang
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Template & Instructions -->
+      <div style="display: flex; flex-direction: column; gap: 24px;">
+        
+        <div class="instructions-card">
+          <h3 class="instructions-title">Template Dokumen</h3>
+          <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.4;">
+            Gunakan file template kami untuk memastikan format kolom sudah sesuai sebelum melakukan import.
+          </p>
+          <a href="FinanceTrack_Import_Template.csv" download="FinanceTrack_Import_Template.csv" class="btn-download-template" onclick="showToast('success', 'Template transaksi berhasil di-download!')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download Template .csv / .xlsx
+          </a>
+        </div>
+
+        <div class="instructions-card">
+          <h3 class="instructions-title">Petunjuk Pengisian</h3>
+          <ul class="instructions-list">
+            <li><strong>Kolom Tanggal:</strong> Gunakan format internasional <code>YYYY-MM-DD</code> (contoh: 2026-07-05).</li>
+            <li><strong>Kolom Tipe:</strong> Tulis <code>Income</code> untuk pemasukan, dan <code>Expense</code> untuk pengeluaran.</li>
+            <li><strong>Kolom Kategori:</strong> Sesuai dengan nama kategori terdaftar (Operasional, Marketing, Gaji, dll). Jika tidak dikenal, sistem otomatis memasukkan ke kategori "Lainnya".</li>
+            <li><strong>Kolom Project:</strong> Tulis nama project (mis. Project Alpha, Project Beta).</li>
+            <li><strong>Kolom Nominal:</strong> Isikan angka saja tanpa format titik/koma desimal ataupun simbol mata uang (contoh: 1500000).</li>
+          </ul>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+<!-- ===================== QUICK ADD MODAL ===================== -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOverlay(event)">
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-header">
+      <h2 id="modalTitle">Tambah Transaksi</h2>
+      <button class="modal-close" onclick="closeModal()" aria-label="Tutup modal">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Type Toggle -->
+      <div class="type-toggle" id="typeToggle">
+        <button class="type-btn expense-btn active" id="expenseBtn" onclick="setType('expense')" aria-pressed="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
+          Pengeluaran
+        </button>
+        <button class="type-btn income-btn" id="incomeBtn" onclick="setType('income')" aria-pressed="false">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          Pemasukan
+        </button>
+      </div>
+
+      <form id="txForm" onsubmit="submitForm(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="fKategori">Kategori</label>
+            <select id="fKategori" required>
+              <option value="">Pilih kategori...</option>
+              <option value="operasional">⚙️ Operasional</option>
+              <option value="marketing">📢 Marketing</option>
+              <option value="gaji">👤 Gaji & Upah</option>
+              <option value="sewa">⚡ Sewa & Listrik</option>
+              <option value="transportasi">🚗 Transportasi</option>
+              <option value="penjualan">🛒 Penjualan</option>
+              <option value="jasa">💼 Jasa</option>
+              <option value="lainnya">📦 Lainnya</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="fNominal">Nominal</label>
+            <div class="input-prefix">
+              <span class="prefix-label">Rp</span>
+              <input type="text" id="fNominal" placeholder="0" oninput="formatRupiah(this)" required autocomplete="off" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="fProject">Project</label>
+            <select id="fProject" required>
+              <option value="alpha">Project Alpha</option>
+              <option value="beta">Project Beta</option>
+              <option value="gamma">Project Gamma</option>
+              <option value="delta">Project Delta</option>
+              <option value="epsilon">Project Epsilon</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="fTanggal">Tanggal</label>
+            <input type="date" id="fTanggal" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="fDeskripsi">Deskripsi</label>
+          <input type="text" id="fDeskripsi" placeholder="Deskripsi singkat transaksi..." required />
+        </div>
+
+        <div class="form-group">
+          <label>Attachment (Opsional)</label>
+          <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fFile').click()">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <span>Drag & drop atau klik untuk upload</span>
+            <small>Foto struk / nota — JPG, PNG, PDF</small>
+            <input type="file" id="fFile" accept="image/*,.pdf" style="display:none" capture="environment" />
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" onclick="closeModal()">Batal</button>
+          <button type="submit" class="btn-primary" id="submitBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Simpan Transaksi
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== TOAST ===================== -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ===================== SCRIPTS ===================== -->
+<script src="app.js"></script>
+<script>
+  // Script interaktif mockup halaman Import
+  function handleFileSelected(input) {
+    if (!input.files || input.files.length === 0) return;
+    
+    const file = input.files[0];
+    document.getElementById('fileNameDisplay').textContent = file.name;
+    
+    // Mockup data rendering untuk simulasi import preview
+    const dummyRows = [
+      { tanggal: '2026-07-04', deskripsi: 'Pembelian domain & hosting server', project: 'Project Beta', kategori: '⚙️ Operasional', tipe: 'Expense', nominal: 'Rp 1.200.000', status: 'Valid' },
+      { tanggal: '2026-07-03', deskripsi: 'DP Pembayaran Proyek Klien', project: 'Project Alpha', kategori: '💼 Jasa', tipe: 'Income', nominal: 'Rp 15.000.000', status: 'Valid' },
+      { tanggal: '2026-07-02', deskripsi: 'Sewa ruang rapat coworking space', project: 'Project Gamma', kategori: '⚡ Sewa & Listrik', tipe: 'Expense', nominal: 'Rp 450.000', status: 'Valid' },
+      { tanggal: '2026-07-01', deskripsi: 'Iklan Facebook & Instagram ads', project: 'Project Beta', kategori: '📢 Marketing', tipe: 'Expense', nominal: 'Rp 2.500.000', status: 'Valid' }
+    ];
+
+    const tbody = document.getElementById('previewTableBody');
+    tbody.innerHTML = '';
+    
+    dummyRows.forEach(row => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><span class="tx-date">${row.tanggal}</span></td>
+        <td>${row.deskripsi}</td>
+        <td><span class="project-badge ${row.project.toLowerCase().replace(' ', '-')}">${row.project}</span></td>
+        <td><span class="category-badge">${row.kategori}</span></td>
+        <td><span class="type-badge ${row.tipe === 'Income' ? 'income-type' : 'expense-type'}">${row.tipe === 'Income' ? '↑ Pemasukan' : '↓ Pengeluaran'}</span></td>
+        <td class="amount-cell ${row.tipe === 'Income' ? 'income' : 'expense'}">${row.nominal}</td>
+        <td><span class="status-badge final">${row.status}</span></td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById('validRowsCount').textContent = dummyRows.length;
+    document.getElementById('previewRowBadge').textContent = `${dummyRows.length} Baris`;
+    
+    // Tampilkan panel preview & hilangkan upload drop zone
+    document.getElementById('bigUploadZone').style.display = 'none';
+    document.getElementById('previewContainer').style.display = 'flex';
+    
+    showToast('success', 'File Excel berhasil dibaca & divalidasi!');
+  }
+
+  function downloadTemplate(e) {
+    e.preventDefault();
+    showToast('success', 'Template Excel "FinanceTrack_Import_Template.xlsx" berhasil didownload!');
+  }
+
+  function executeImport() {
+    const btn = document.getElementById('btnImportExecute');
+    btn.disabled = true;
+    btn.textContent = 'Mengimport data...';
+
+    setTimeout(() => {
+      showToast('success', '✅ 4 Data transaksi berhasil di-import ke dashboard!');
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 1500);
+    }, 1500);
+  }
+</script>
+</body>
+</html>

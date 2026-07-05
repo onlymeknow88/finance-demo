@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FinanceTrack — Laporan Keuangan</title>
+  <meta name="description" content="Sistem Reporting Keuangan — Laporan Cash Flow, Laba Rugi Sederhana, dan Rekap Kategori Keuangan." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Styling tambahan khusus halaman laporan keuangan */
+    .report-tabs-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 4px;
+      margin-bottom: 8px;
+    }
+
+    .report-type-tabs {
+      display: flex;
+      gap: 8px;
+    }
+
+    .report-type-tab {
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .report-type-tab:hover {
+      color: var(--primary);
+    }
+
+    .report-type-tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .report-export-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .report-content-panel {
+      display: none;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .report-content-panel.active {
+      display: flex;
+    }
+
+    .report-grid-summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .profit-loss-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      overflow: hidden;
+    }
+
+    .profit-loss-table tr.header-row {
+      background: var(--bg);
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .profit-loss-table td {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+
+    .profit-loss-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .profit-loss-table td.indent {
+      padding-left: 40px;
+    }
+
+    .profit-loss-table td.amount {
+      text-align: right;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .profit-loss-table tr.total-row {
+      font-weight: 700;
+      background: rgba(99, 102, 241, 0.05);
+    }
+
+    .profit-loss-table tr.total-row td {
+      color: var(--text-primary);
+      border-top: 1px solid var(--border);
+    }
+
+    .profit-loss-table tr.final-row {
+      font-weight: 800;
+      font-size: 16px;
+      background: rgba(99, 102, 241, 0.12);
+    }
+
+    .profit-loss-table tr.final-row td {
+      color: var(--primary);
+      border-top: 2px solid var(--primary);
+    }
+
+    .report-side-charts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 1024px) {
+      .report-grid-summary { grid-template-columns: 1fr; }
+      .report-side-charts { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===================== SIDEBAR ===================== -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+      </svg>
+    </div>
+    <div class="logo-text">
+      <span class="logo-title">FinanceTrack</span>
+      <span class="logo-sub">Income & Expense Tracker</span>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a href="index.html" class="nav-item" id="nav-dashboard">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+
+    <div class="nav-section-label">TRANSAKSI</div>
+    <a href="transaksi.html" class="nav-item" id="nav-transaksi">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Transaksi
+    </a>
+    <a href="#" class="nav-item" id="nav-tambah">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      Tambah Transaksi
+    </a>
+    <a href="#" class="nav-item" id="nav-template">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 6v12"/><path d="M8 10h8"/><path d="M8 14h8"/></svg>
+      Template Berulang
+    </a>
+    <a href="import.html" class="nav-item" id="nav-import">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Import Excel/CSV
+    </a>
+
+    <div class="nav-section-label">MASTER DATA</div>
+    <a href="kategori.html" class="nav-item" id="nav-kategori">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+      Kategori
+    </a>
+    <a href="project.html" class="nav-item" id="nav-project">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      Project
+    </a>
+    <a href="budget.html" class="nav-item" id="nav-budget">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      Budget
+    </a>
+
+    <div class="nav-section-label">LAPORAN</div>
+    <a href="laporan.html" class="nav-item active" id="nav-laporan">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Laporan
+    </a>
+    <a href="#" class="nav-item" id="nav-export">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export PDF/Excel
+    </a>
+
+    <div class="nav-section-label">PENGATURAN</div>
+    <a href="#" class="nav-item" id="nav-pengguna">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Pengguna
+    </a>
+    <a href="#" class="nav-item" id="nav-pengaturan">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Pengaturan
+    </a>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <div class="dark-mode-toggle">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <span>Dark Mode</span>
+      <div class="toggle-switch active" id="themeToggle" onclick="toggleTheme()">
+        <div class="toggle-thumb"></div>
+      </div>
+    </div>
+    <div class="sidebar-profile">
+      <div class="avatar">JD</div>
+      <div class="profile-info">
+        <span class="profile-name">John Doe</span>
+        <span class="profile-role">Owner</span>
+      </div>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+  </div>
+</aside>
+
+<!-- ===================== MAIN CONTENT ===================== -->
+<div class="main-wrapper">
+
+  <!-- HEADER -->
+  <header class="topbar" id="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" aria-label="Toggle Sidebar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="project-switcher" id="projectSwitcher">
+        <span>Semua Project</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        <div class="project-dropdown" id="projectDropdown">
+          <div class="dropdown-item active">Semua Project</div>
+          <div class="dropdown-item">Project Alpha</div>
+          <div class="dropdown-item">Project Beta</div>
+          <div class="dropdown-item">Project Gamma</div>
+          <div class="dropdown-item">Project Delta</div>
+          <div class="dropdown-item">Project Epsilon</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="topbar-search" id="globalSearchBar" onclick="openSearch()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <span>Cari transaksi, kategori, project...</span>
+      <kbd>Ctrl + K</kbd>
+    </div>
+
+    <div class="topbar-right">
+      <button class="icon-btn notif-btn" id="notifBtn" aria-label="Notifikasi">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="badge">3</span>
+      </button>
+      <button class="icon-btn" id="helpBtn" aria-label="Bantuan">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </button>
+      <div class="header-avatar" id="headerAvatar">JD</div>
+    </div>
+  </header>
+
+  <!-- PAGE CONTENT -->
+  <main class="content" id="mainContent">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Laporan Keuangan</h1>
+        <p class="page-sub">Analisa cash flow, profitabilitas project, dan detail laba-rugi bisnis</p>
+      </div>
+      <div class="date-filter" id="dateFilter">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span>Juni - Juli 2026</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+    </div>
+
+    <!-- REPORT TABS ROW -->
+    <div class="report-tabs-row">
+      <div class="report-type-tabs">
+        <button class="report-type-tab active" onclick="switchReportTab('cashflow', this)">Laporan Cash Flow</button>
+        <button class="report-type-tab" onclick="switchReportTab('labarugi', this)">Laba Rugi Sederhana</button>
+        <button class="report-type-tab" onclick="switchReportTab('kategori', this)">Rekap Per Kategori</button>
+      </div>
+
+      <div class="report-export-group">
+        <button class="btn-outline" onclick="showToast('success', 'Laporan berhasil di-export ke Excel!')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          Export Excel
+        </button>
+        <a href="laporan-pdf.html" target="_blank" class="btn-primary" style="text-decoration:none;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export PDF
+        </a>
+      </div>
+    </div>
+
+    <!-- ==================== PANEL 1: CASH FLOW ==================== -->
+    <div class="report-content-panel active" id="panel-cashflow">
+      <!-- Mini Summary Row -->
+      <div class="report-grid-summary">
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <span class="stat-label">Total Pemasukan (Cash In)</span>
+            <div class="stat-icon income-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
+          </div>
+          <div class="stat-amount">Rp 245.750.000</div>
+          <div class="stat-trend positive">Arus kas masuk aktif</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <span class="stat-label">Total Pengeluaran (Cash Out)</span>
+            <div class="stat-icon expense-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg></div>
+          </div>
+          <div class="stat-amount">Rp 178.320.000</div>
+          <div class="stat-trend negative">Operasional & Gaji dominan</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <span class="stat-label">Surplus Arus Kas</span>
+            <div class="stat-icon balance-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+          </div>
+          <div class="stat-amount highlight">+Rp 67.430.000</div>
+          <div class="stat-trend positive">Kondisi Kas Sehat</div>
+        </div>
+      </div>
+
+      <!-- Cash Flow Chart Wide -->
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <div>
+            <h2 class="chart-title">Visualisasi Tren Arus Kas Bulanan</h2>
+            <p class="chart-subtitle">Pemasukan vs Pengeluaran Periode Berjalan</p>
+          </div>
+        </div>
+        <div class="chart-wrap" style="height: 280px;">
+          <canvas id="reportCashFlowChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== PANEL 2: LABA RUGI ==================== -->
+    <div class="report-content-panel" id="panel-labarugi">
+      
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <div>
+            <h2 class="chart-title">Laporan Laba Rugi Sederhana</h2>
+            <p class="chart-subtitle">Periode: Juni - Juli 2026</p>
+          </div>
+        </div>
+
+        <table class="profit-loss-table">
+          <tr class="header-row">
+            <td>Komponen Keuangan</td>
+            <td style="text-align: right;">Jumlah (Rupiah)</td>
+          </tr>
+          
+          <!-- Pendapatan -->
+          <tr style="font-weight: 600;">
+            <td>PENDAPATAN USAHA</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="indent">Pendapatan Penjualan Langsung</td>
+            <td class="amount">Rp 210.750.000</td>
+          </tr>
+          <tr>
+            <td class="indent">Pendapatan Jasa Konsultasi</td>
+            <td class="amount">Rp 35.000.000</td>
+          </tr>
+          <tr class="total-row">
+            <td>TOTAL PENDAPATAN (A)</td>
+            <td class="amount" style="color: var(--success);">Rp 245.750.000</td>
+          </tr>
+
+          <!-- Pengeluaran -->
+          <tr style="font-weight: 600; padding-top: 16px;">
+            <td>Beban Pengeluaran Operasional</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="indent">Beban Gaji & Upah Karyawan</td>
+            <td class="amount">Rp 32.000.000</td>
+          </tr>
+          <tr>
+            <td class="indent">Beban Pemasaran & Iklan digital</td>
+            <td class="amount">Rp 38.450.000</td>
+          </tr>
+          <tr>
+            <td class="indent">Beban Sewa Gudang & Daya Listrik</td>
+            <td class="amount">Rp 18.750.000</td>
+          </tr>
+          <tr>
+            <td class="indent">Beban Alat Tulis Kantor & Operasional Harian</td>
+            <td class="amount">Rp 64.250.000</td>
+          </tr>
+          <tr>
+            <td class="indent">Beban Transportasi & Bahan Bakar</td>
+            <td class="amount">Rp 12.300.000</td>
+          </tr>
+          <tr>
+            <td class="indent">Beban Lain-Lain</td>
+            <td class="amount">Rp 12.570.000</td>
+          </tr>
+          <tr class="total-row">
+            <td>TOTAL PENGELUARAN BEBAN (B)</td>
+            <td class="amount" style="color: var(--danger);">Rp 178.320.000</td>
+          </tr>
+
+          <!-- Laba Bersih -->
+          <tr class="final-row">
+            <td>LABA BERSIH OPERASIONAL (A - B)</td>
+            <td class="amount">Rp 67.430.000</td>
+          </tr>
+        </table>
+      </div>
+
+    </div>
+
+    <!-- ==================== PANEL 3: BREAKDOWN KATEGORI ==================== -->
+    <div class="report-content-panel" id="panel-kategori">
+      <div class="report-side-charts">
+        
+        <!-- Expense composition pie chart -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <h2 class="chart-title">Breakdown Pengeluaran</h2>
+              <p class="chart-subtitle">Pembagian porsi pengeluaran berdasarkan kategori</p>
+            </div>
+          </div>
+          <div class="chart-wrap" style="height: 240px; display:flex; justify-content:center;">
+            <canvas id="reportExpensePieChart" style="max-width: 240px;"></canvas>
+          </div>
+        </div>
+
+        <!-- Income composition pie chart -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <h2 class="chart-title">Breakdown Pemasukan</h2>
+              <p class="chart-subtitle">Pembagian porsi pemasukan berdasarkan kategori</p>
+            </div>
+          </div>
+          <div class="chart-wrap" style="height: 240px; display:flex; justify-content:center;">
+            <canvas id="reportIncomePieChart" style="max-width: 240px;"></canvas>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ===================== QUICK ADD MODAL ===================== -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOverlay(event)">
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-header">
+      <h2 id="modalTitle">Tambah Transaksi</h2>
+      <button class="modal-close" onclick="closeModal()" aria-label="Tutup modal">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Type Toggle -->
+      <div class="type-toggle" id="typeToggle">
+        <button class="type-btn expense-btn active" id="expenseBtn" onclick="setType('expense')" aria-pressed="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
+          Pengeluaran
+        </button>
+        <button class="type-btn income-btn" id="incomeBtn" onclick="setType('income')" aria-pressed="false">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          Pemasukan
+        </button>
+      </div>
+
+      <form id="txForm" onsubmit="submitForm(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="fKategori">Kategori</label>
+            <select id="fKategori" required>
+              <option value="">Pilih kategori...</option>
+              <option value="operasional">⚙️ Operasional</option>
+              <option value="marketing">📢 Marketing</option>
+              <option value="gaji">👤 Gaji & Upah</option>
+              <option value="sewa">⚡ Sewa & Listrik</option>
+              <option value="transportasi">🚗 Transportasi</option>
+              <option value="penjualan">🛒 Penjualan</option>
+              <option value="jasa">💼 Jasa</option>
+              <option value="lainnya">📦 Lainnya</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="fNominal">Nominal</label>
+            <div class="input-prefix">
+              <span class="prefix-label">Rp</span>
+              <input type="text" id="fNominal" placeholder="0" oninput="formatRupiah(this)" required autocomplete="off" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="fProject">Project</label>
+            <select id="fProject" required>
+              <option value="alpha">Project Alpha</option>
+              <option value="beta">Project Beta</option>
+              <option value="gamma">Project Gamma</option>
+              <option value="delta">Project Delta</option>
+              <option value="epsilon">Project Epsilon</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="fTanggal">Tanggal</label>
+            <input type="date" id="fTanggal" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="fDeskripsi">Deskripsi</label>
+          <input type="text" id="fDeskripsi" placeholder="Deskripsi singkat transaksi..." required />
+        </div>
+
+        <div class="form-group">
+          <label>Attachment (Opsional)</label>
+          <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fFile').click()">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <span>Drag & drop atau klik untuk upload</span>
+            <small>Foto struk / nota — JPG, PNG, PDF</small>
+            <input type="file" id="fFile" accept="image/*,.pdf" style="display:none" capture="environment" />
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" onclick="closeModal()">Batal</button>
+          <button type="submit" class="btn-primary" id="submitBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Simpan Transaksi
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== TOAST ===================== -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ===================== SCRIPTS ===================== -->
+<script src="app.js"></script>
+<script>
+  // Script navigasi tab panel halaman laporan keuangan
+  function switchReportTab(tabId, btn) {
+    document.querySelectorAll('.report-type-tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.report-content-panel').forEach(p => p.classList.remove('active'));
+    
+    btn.classList.add('active');
+    document.getElementById('panel-' + tabId).classList.add('active');
+    showToast('info', 'Menampilkan panel laporan ' + btn.textContent);
+  }
+
+  // Inisialisasi Chart Khusus Halaman Laporan Keuangan
+  let reportCashFlowChart;
+  let reportExpensePieChart;
+  let reportIncomePieChart;
+
+  function initReportCharts() {
+    // 1. Cash flow line chart
+    const cfCtx = document.getElementById('reportCashFlowChart');
+    if (cfCtx) {
+      reportCashFlowChart = new Chart(cfCtx, {
+        type: 'line',
+        data: {
+          labels: ['Feb 2026', 'Mar 2026', 'Apr 2026', 'Mei 2026', 'Jun 2026', 'Jul 2026'],
+          datasets: [
+            {
+              label: 'Cash In',
+              data: [195000, 210000, 188000, 225000, 240000, 245750],
+              borderColor: '#22C55E',
+              backgroundColor: 'rgba(34,197,94,0.06)',
+              fill: true,
+              tension: 0.35
+            },
+            {
+              label: 'Cash Out',
+              data: [135000, 142000, 128000, 155000, 168000, 178320],
+              borderColor: '#EF4444',
+              backgroundColor: 'rgba(239,68,68,0.04)',
+              fill: true,
+              tension: 0.35
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: true } }
+        }
+      });
+    }
+
+    // 2. Expense Pie
+    const expCtx = document.getElementById('reportExpensePieChart');
+    if (expCtx) {
+      reportExpensePieChart = new Chart(expCtx, {
+        type: 'pie',
+        data: {
+          labels: ['Operasional', 'Marketing', 'Gaji & Upah', 'Sewa & Listrik', 'Transportasi', 'Lainnya'],
+          datasets: [{
+            data: [64250, 38450, 32000, 18750, 12300, 12570],
+            backgroundColor: ['#10B981', '#3B82F6', '#F59E0B', '#8B5CF6', '#EC4899', '#6B7280'],
+            borderWidth: 2,
+            borderColor: '#1e293b'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'right',
+              labels: {
+                color: '#94a3b8',
+                font: { family: 'Inter', size: 11 }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // 3. Income Pie
+    const incCtx = document.getElementById('reportIncomePieChart');
+    if (incCtx) {
+      reportIncomePieChart = new Chart(incCtx, {
+        type: 'pie',
+        data: {
+          labels: ['Penjualan Langsung', 'Jasa Konsultasi'],
+          datasets: [{
+            data: [210750, 35000],
+            backgroundColor: ['#10B981', '#3B82F6'],
+            borderWidth: 2,
+            borderColor: '#1e293b'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'right',
+              labels: {
+                color: '#94a3b8',
+                font: { family: 'Inter', size: 11 }
+              }
+            }
+          }
+        }
+      });
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    initReportCharts();
+  });
+</script>
+</body>
+</html>

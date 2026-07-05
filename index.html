@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FinanceTrack — Income & Expense Tracker</title>
+  <meta name="description" content="Sistem Reporting Keuangan — Dashboard real-time untuk monitoring cash flow, income, expense, dan performa project bisnis." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ===================== SIDEBAR ===================== -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+      </svg>
+    </div>
+    <div class="logo-text">
+      <span class="logo-title">FinanceTrack</span>
+      <span class="logo-sub">Income & Expense Tracker</span>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a href="#" class="nav-item active" id="nav-dashboard">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+
+    <div class="nav-section-label">TRANSAKSI</div>
+    <a href="transaksi.html" class="nav-item" id="nav-transaksi">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Transaksi
+    </a>
+    <a href="#" class="nav-item" id="nav-tambah">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      Tambah Transaksi
+    </a>
+    <a href="template.html" class="nav-item" id="nav-template">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 6v12"/><path d="M8 10h8"/><path d="M8 14h8"/></svg>
+      Template Berulang
+    </a>
+    <a href="import.html" class="nav-item" id="nav-import">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Import Excel/CSV
+    </a>
+
+    <div class="nav-section-label">MASTER DATA</div>
+    <a href="kategori.html" class="nav-item" id="nav-kategori">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+      Kategori
+    </a>
+    <a href="project.html" class="nav-item" id="nav-project">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      Project
+    </a>
+    <a href="budget.html" class="nav-item" id="nav-budget">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      Budget
+    </a>
+
+    <div class="nav-section-label">LAPORAN</div>
+    <a href="laporan.html" class="nav-item" id="nav-laporan">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Laporan
+    </a>
+    <a href="#" class="nav-item" id="nav-export">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export PDF/Excel
+    </a>
+
+    <div class="nav-section-label">PENGATURAN</div>
+    <a href="#" class="nav-item" id="nav-pengguna">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Pengguna
+    </a>
+    <a href="#" class="nav-item" id="nav-pengaturan">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Pengaturan
+    </a>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <div class="dark-mode-toggle">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <span>Dark Mode</span>
+      <div class="toggle-switch active" id="themeToggle" onclick="toggleTheme()">
+        <div class="toggle-thumb"></div>
+      </div>
+    </div>
+    <div class="sidebar-profile">
+      <div class="avatar">JD</div>
+      <div class="profile-info">
+        <span class="profile-name">John Doe</span>
+        <span class="profile-role">Owner</span>
+      </div>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+  </div>
+</aside>
+
+<!-- ===================== MAIN CONTENT ===================== -->
+<div class="main-wrapper">
+
+  <!-- HEADER -->
+  <header class="topbar" id="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" aria-label="Toggle Sidebar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="project-switcher" id="projectSwitcher">
+        <span>Semua Project</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        <div class="project-dropdown" id="projectDropdown">
+          <div class="dropdown-item active">Semua Project</div>
+          <div class="dropdown-item">Project Alpha</div>
+          <div class="dropdown-item">Project Beta</div>
+          <div class="dropdown-item">Project Gamma</div>
+          <div class="dropdown-item">Project Delta</div>
+          <div class="dropdown-item">Project Epsilon</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="topbar-search" id="globalSearchBar" onclick="openSearch()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <span>Cari transaksi, kategori, project...</span>
+      <kbd>Ctrl + K</kbd>
+    </div>
+
+    <div class="topbar-right">
+      <button class="icon-btn notif-btn" id="notifBtn" aria-label="Notifikasi">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="badge">3</span>
+      </button>
+      <button class="icon-btn" id="helpBtn" aria-label="Bantuan">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </button>
+      <div class="header-avatar" id="headerAvatar">JD</div>
+    </div>
+  </header>
+
+  <!-- PAGE CONTENT -->
+  <main class="content" id="mainContent">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Dashboard</h1>
+        <p class="page-sub">Ringkasan keuangan semua project</p>
+      </div>
+      <div class="date-filter" id="dateFilter">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span>01 Jun 2026 - 05 Jul 2026</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+    </div>
+
+    <!-- ===== SUMMARY CARDS ===== -->
+    <div class="summary-grid" id="summaryCards">
+
+      <div class="stat-card" id="card-income">
+        <div class="stat-card-header">
+          <span class="stat-label">Total Pemasukan</span>
+          <div class="stat-icon income-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          </div>
+        </div>
+        <div class="stat-amount">Rp 245.750.000</div>
+        <div class="stat-trend positive">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+          18.2% dari periode lalu
+        </div>
+        <div class="stat-sparkline">
+          <svg viewBox="0 0 80 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polyline points="0,22 12,18 24,20 36,12 48,14 60,8 72,6 80,4" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="stat-card" id="card-expense">
+        <div class="stat-card-header">
+          <span class="stat-label">Total Pengeluaran</span>
+          <div class="stat-icon expense-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
+          </div>
+        </div>
+        <div class="stat-amount">Rp 178.320.000</div>
+        <div class="stat-trend negative">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 9 12 15 6 9"/></svg>
+          9.4% dari periode lalu
+        </div>
+        <div class="stat-sparkline">
+          <svg viewBox="0 0 80 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polyline points="0,8 12,12 24,10 36,16 48,14 60,20 72,18 80,22" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="stat-card" id="card-profit">
+        <div class="stat-card-header">
+          <span class="stat-label">Saldo Bersih</span>
+          <div class="stat-icon balance-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          </div>
+        </div>
+        <div class="stat-amount highlight">Rp 67.430.000</div>
+        <div class="stat-trend positive">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+          28.7% dari periode lalu
+        </div>
+        <div class="stat-sparkline">
+          <svg viewBox="0 0 80 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polyline points="0,24 12,20 24,22 36,15 48,12 60,10 72,7 80,4" fill="none" stroke="#6366F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="stat-card" id="card-transactions">
+        <div class="stat-card-header">
+          <span class="stat-label">Total Transaksi</span>
+          <div class="stat-icon tx-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          </div>
+        </div>
+        <div class="stat-amount">312</div>
+        <div class="stat-trend positive">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+          12.1% dari periode lalu
+        </div>
+        <div class="stat-sparkline">
+          <svg viewBox="0 0 80 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polyline points="0,20 12,16 24,18 36,13 48,15 60,11 72,9 80,7" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="stat-card" id="card-daily">
+        <div class="stat-card-header">
+          <span class="stat-label">Rata-rata/Hari</span>
+          <div class="stat-icon avg-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+        </div>
+        <div class="stat-amount">Rp 8.105.000</div>
+        <div class="stat-trend positive">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+          15.3% dari periode lalu
+        </div>
+        <div class="stat-sparkline">
+          <svg viewBox="0 0 80 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polyline points="0,18 12,14 24,16 36,10 48,12 60,7 72,5 80,3" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===== CHARTS ROW 1 ===== -->
+    <div class="charts-row" id="chartsRow1">
+
+      <!-- Cash Flow Chart -->
+      <div class="chart-card wide" id="cashFlowCard">
+        <div class="chart-card-header">
+          <div>
+            <h2 class="chart-title">Tren Cash Flow</h2>
+            <p class="chart-subtitle">Pemasukan vs Pengeluaran vs Saldo Bersih</p>
+          </div>
+          <div class="chart-controls">
+            <div class="period-tabs" id="cashFlowPeriod">
+              <button class="period-tab" onclick="setCashFlowPeriod('harian', this)">Harian</button>
+              <button class="period-tab active" onclick="setCashFlowPeriod('mingguan', this)">Mingguan</button>
+              <button class="period-tab" onclick="setCashFlowPeriod('bulanan', this)">Bulanan</button>
+            </div>
+            <button class="icon-btn" aria-label="Export chart">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="chart-legend" id="cashFlowLegend">
+          <span class="legend-item"><span class="legend-dot" style="background:#22C55E"></span>Pemasukan</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#EF4444"></span>Pengeluaran</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#6366F1"></span>Saldo Bersih</span>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="cashFlowChart" aria-label="Cash Flow Chart"></canvas>
+        </div>
+      </div>
+
+      <!-- Donut Chart -->
+      <div class="chart-card narrow" id="donutCard">
+        <div class="chart-card-header">
+          <div>
+            <h2 class="chart-title">Komposisi Pengeluaran</h2>
+            <p class="chart-subtitle">Per kategori</p>
+          </div>
+          <div class="chart-controls">
+            <div class="period-tabs">
+              <button class="period-tab active">Semua Kategori</button>
+            </div>
+          </div>
+        </div>
+        <div class="donut-wrap">
+          <canvas id="donutChart" aria-label="Expense Category Donut Chart"></canvas>
+          <div class="donut-center">
+            <span class="donut-label">Total</span>
+            <span class="donut-total">Rp 178.3jt</span>
+          </div>
+        </div>
+        <div class="donut-legend" id="donutLegend">
+          <div class="donut-legend-item"><span class="legend-dot" style="background:#22C55E"></span><span>Operasional</span><span class="dl-amt">Rp 64.250.000</span><span class="dl-pct">36%</span></div>
+          <div class="donut-legend-item"><span class="legend-dot" style="background:#3B82F6"></span><span>Marketing</span><span class="dl-amt">Rp 38.450.000</span><span class="dl-pct">22%</span></div>
+          <div class="donut-legend-item"><span class="legend-dot" style="background:#F59E0B"></span><span>Gaji & Upah</span><span class="dl-amt">Rp 32.000.000</span><span class="dl-pct">18%</span></div>
+          <div class="donut-legend-item"><span class="legend-dot" style="background:#8B5CF6"></span><span>Sewa & Listrik</span><span class="dl-amt">Rp 18.750.000</span><span class="dl-pct">11%</span></div>
+          <div class="donut-legend-item"><span class="legend-dot" style="background:#EC4899"></span><span>Transportasi</span><span class="dl-amt">Rp 12.300.000</span><span class="dl-pct">7%</span></div>
+          <div class="donut-legend-item"><span class="legend-dot" style="background:#94A3B8"></span><span>Lainnya</span><span class="dl-amt">Rp 12.570.000</span><span class="dl-pct">7%</span></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===== CHARTS ROW 2 ===== -->
+    <div class="charts-row-3" id="chartsRow2">
+
+      <!-- Monthly Comparison -->
+      <div class="chart-card" id="monthlyCard">
+        <div class="chart-card-header">
+          <div>
+            <h2 class="chart-title">Perbandingan Bulan ke Bulan</h2>
+            <p class="chart-subtitle">Income vs Expense per bulan</p>
+          </div>
+          <div class="chart-controls">
+            <div class="period-tabs">
+              <button class="period-tab active">6 Bulan Terakhir</button>
+            </div>
+          </div>
+        </div>
+        <div class="chart-legend">
+          <span class="legend-item"><span class="legend-dot" style="background:#22C55E"></span>Pemasukan</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#EF4444"></span>Pengeluaran</span>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="monthlyChart" aria-label="Monthly Comparison Chart"></canvas>
+        </div>
+      </div>
+
+      <!-- Project Performance -->
+      <div class="chart-card" id="projectCard">
+        <div class="chart-card-header">
+          <div>
+            <h2 class="chart-title">Performa per Project</h2>
+            <p class="chart-subtitle">Income vs Expense per project</p>
+          </div>
+          <div class="chart-controls">
+            <div class="period-tabs">
+              <button class="period-tab active">Semua Project</button>
+            </div>
+          </div>
+        </div>
+        <div class="chart-legend">
+          <span class="legend-item"><span class="legend-dot" style="background:#22C55E"></span>Pemasukan</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#EF4444"></span>Pengeluaran</span>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="projectChart" aria-label="Project Performance Chart"></canvas>
+        </div>
+      </div>
+
+      <!-- Top 5 Transactions -->
+      <div class="chart-card" id="topTxCard">
+        <div class="chart-card-header">
+          <div>
+            <h2 class="chart-title">Top 5 Transaksi Terbesar</h2>
+            <p class="chart-subtitle">Deteksi anomali cepat</p>
+          </div>
+        </div>
+        <div class="top-tx-list" id="topTxList">
+          <div class="top-tx-item">
+            <div class="tx-icon-wrap expense-bg">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            </div>
+            <div class="tx-info">
+              <span class="tx-name">Pembelian Mesin Produksi</span>
+              <span class="tx-meta">Project Alpha · 01 Jul 2026</span>
+            </div>
+            <span class="tx-amount expense">-Rp 25.000.000</span>
+          </div>
+          <div class="top-tx-item">
+            <div class="tx-icon-wrap income-bg">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <div class="tx-info">
+              <span class="tx-name">Pemasukan Penjualan Besar</span>
+              <span class="tx-meta">Project Beta · 30 Jun 2026</span>
+            </div>
+            <span class="tx-amount income">+Rp 20.000.000</span>
+          </div>
+          <div class="top-tx-item">
+            <div class="tx-icon-wrap expense-bg">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            </div>
+            <div class="tx-info">
+              <span class="tx-name">Pembayaran Gaji Karyawan</span>
+              <span class="tx-meta">Project Alpha · 28 Jun 2026</span>
+            </div>
+            <span class="tx-amount expense">-Rp 15.500.000</span>
+          </div>
+          <div class="top-tx-item">
+            <div class="tx-icon-wrap expense-bg">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+            </div>
+            <div class="tx-info">
+              <span class="tx-name">Pembayaran Sewa Gudang</span>
+              <span class="tx-meta">Project Gamma · 25 Jun 2026</span>
+            </div>
+            <span class="tx-amount expense">-Rp 12.000.000</span>
+          </div>
+          <div class="top-tx-item">
+            <div class="tx-icon-wrap income-bg">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+            </div>
+            <div class="tx-info">
+              <span class="tx-name">Pemasukan Jasa Konsultasi</span>
+              <span class="tx-meta">Project Delta · 22 Jun 2026</span>
+            </div>
+            <span class="tx-amount income">+Rp 10.000.000</span>
+          </div>
+        </div>
+        <a href="#" class="see-all-link" id="seeAllTop">Lihat semua transaksi →</a>
+      </div>
+
+    </div>
+
+    <!-- ===== LATEST TRANSACTIONS TABLE ===== -->
+    <div class="table-card" id="latestTxCard">
+      <div class="table-card-header">
+        <div>
+          <h2 class="chart-title">Transaksi Terbaru</h2>
+          <p class="chart-subtitle">10 transaksi terakhir dari semua project</p>
+        </div>
+        <div class="table-actions">
+          <div class="search-input-wrap">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" placeholder="Cari transaksi..." id="txSearch" aria-label="Cari transaksi" />
+          </div>
+          <button class="btn-outline" id="filterBtn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+            Filter
+          </button>
+          <a href="#" class="see-all-link" id="seeAllTx">Lihat semua →</a>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="tx-table" id="txTable">
+          <thead>
+            <tr>
+              <th>Tanggal</th>
+              <th>Deskripsi</th>
+              <th>Project</th>
+              <th>Kategori</th>
+              <th>Tipe</th>
+              <th>Nominal</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="txTableBody">
+            <tr>
+              <td><span class="tx-date">05 Jul 2026<br/><small>10:23</small></span></td>
+              <td>Pembelian ATK Kantor</td>
+              <td><span class="project-badge alpha">Project Alpha</span></td>
+              <td><span class="category-badge">⚙️ Operasional</span></td>
+              <td><span class="type-badge expense-type">↓ Pengeluaran</span></td>
+              <td class="amount-cell expense">-Rp 250.000</td>
+              <td><span class="status-badge final">Final</span></td>
+              <td><div class="action-btns"><button class="action-btn" aria-label="Edit"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="action-btn danger" aria-label="Hapus"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button></div></td>
+            </tr>
+            <tr>
+              <td><span class="tx-date">05 Jul 2026<br/><small>09:15</small></span></td>
+              <td>Penjualan Produk A</td>
+              <td><span class="project-badge beta">Project Beta</span></td>
+              <td><span class="category-badge">🛒 Penjualan</span></td>
+              <td><span class="type-badge income-type">↑ Pemasukan</span></td>
+              <td class="amount-cell income">+Rp 1.500.000</td>
+              <td><span class="status-badge final">Final</span></td>
+              <td><div class="action-btns"><button class="action-btn" aria-label="Edit"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="action-btn danger" aria-label="Hapus"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button></div></td>
+            </tr>
+            <tr>
+              <td><span class="tx-date">04 Jul 2026<br/><small>16:40</small></span></td>
+              <td>Biaya Marketing Digital</td>
+              <td><span class="project-badge gamma">Project Gamma</span></td>
+              <td><span class="category-badge">📢 Marketing</span></td>
+              <td><span class="type-badge expense-type">↓ Pengeluaran</span></td>
+              <td class="amount-cell expense">-Rp 3.500.000</td>
+              <td><span class="status-badge pending">Pending</span></td>
+              <td><div class="action-btns"><button class="action-btn" aria-label="Edit"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="action-btn danger" aria-label="Hapus"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button></div></td>
+            </tr>
+            <tr>
+              <td><span class="tx-date">04 Jul 2026<br/><small>11:05</small></span></td>
+              <td>Jasa Konsultasi IT</td>
+              <td><span class="project-badge delta">Project Delta</span></td>
+              <td><span class="category-badge">💼 Jasa</span></td>
+              <td><span class="type-badge income-type">↑ Pemasukan</span></td>
+              <td class="amount-cell income">+Rp 5.000.000</td>
+              <td><span class="status-badge approved">Approved</span></td>
+              <td><div class="action-btns"><button class="action-btn" aria-label="Edit"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="action-btn danger" aria-label="Hapus"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button></div></td>
+            </tr>
+            <tr>
+              <td><span class="tx-date">03 Jul 2026<br/><small>08:30</small></span></td>
+              <td>Tagihan Listrik Gudang</td>
+              <td><span class="project-badge alpha">Project Alpha</span></td>
+              <td><span class="category-badge">⚡ Sewa & Listrik</span></td>
+              <td><span class="type-badge expense-type">↓ Pengeluaran</span></td>
+              <td class="amount-cell expense">-Rp 850.000</td>
+              <td><span class="status-badge final">Final</span></td>
+              <td><div class="action-btns"><button class="action-btn" aria-label="Edit"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="action-btn danger" aria-label="Hapus"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination" id="txPagination">
+        <span class="page-info">Menampilkan 1-5 dari 312 transaksi</span>
+        <div class="page-btns">
+          <button class="page-btn" disabled aria-label="Halaman sebelumnya">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <span class="page-ellipsis">...</span>
+          <button class="page-btn">63</button>
+          <button class="page-btn" aria-label="Halaman berikutnya">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ===================== QUICK ADD MODAL ===================== -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOverlay(event)">
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-header">
+      <h2 id="modalTitle">Tambah Transaksi</h2>
+      <button class="modal-close" onclick="closeModal()" aria-label="Tutup modal">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Type Toggle -->
+      <div class="type-toggle" id="typeToggle">
+        <button class="type-btn expense-btn active" id="expenseBtn" onclick="setType('expense')" aria-pressed="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
+          Pengeluaran
+        </button>
+        <button class="type-btn income-btn" id="incomeBtn" onclick="setType('income')" aria-pressed="false">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          Pemasukan
+        </button>
+      </div>
+
+      <form id="txForm" onsubmit="submitForm(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="fKategori">Kategori</label>
+            <select id="fKategori" required>
+              <option value="">Pilih kategori...</option>
+              <option value="operasional">⚙️ Operasional</option>
+              <option value="marketing">📢 Marketing</option>
+              <option value="gaji">👤 Gaji & Upah</option>
+              <option value="sewa">⚡ Sewa & Listrik</option>
+              <option value="transportasi">🚗 Transportasi</option>
+              <option value="penjualan">🛒 Penjualan</option>
+              <option value="jasa">💼 Jasa</option>
+              <option value="lainnya">📦 Lainnya</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="fNominal">Nominal</label>
+            <div class="input-prefix">
+              <span class="prefix-label">Rp</span>
+              <input type="text" id="fNominal" placeholder="0" oninput="formatRupiah(this)" required autocomplete="off" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="fProject">Project</label>
+            <select id="fProject" required>
+              <option value="alpha">Project Alpha</option>
+              <option value="beta">Project Beta</option>
+              <option value="gamma">Project Gamma</option>
+              <option value="delta">Project Delta</option>
+              <option value="epsilon">Project Epsilon</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="fTanggal">Tanggal</label>
+            <input type="date" id="fTanggal" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="fDeskripsi">Deskripsi</label>
+          <input type="text" id="fDeskripsi" placeholder="Deskripsi singkat transaksi..." required />
+        </div>
+
+        <div class="form-group">
+          <label>Attachment (Opsional)</label>
+          <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fFile').click()">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <span>Drag & drop atau klik untuk upload</span>
+            <small>Foto struk / nota — JPG, PNG, PDF</small>
+            <input type="file" id="fFile" accept="image/*,.pdf" style="display:none" capture="environment" />
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" onclick="closeModal()">Batal</button>
+          <button type="submit" class="btn-primary" id="submitBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Simpan Transaksi
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== TOAST ===================== -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ===================== SCRIPTS ===================== -->
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FinanceTrack — Daftar Transaksi</title>
+  <meta name="description" content="Sistem Reporting Keuangan — Manajemen detail riwayat transaksi keuangan masuk dan keluar." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Styling tambahan khusus halaman manajemen transaksi */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 16px 20px;
+      box-shadow: var(--card-shadow);
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .filter-group label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .filter-control {
+      height: 38px;
+      padding: 0 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--text-primary);
+      outline: none;
+      font-family: inherit;
+      cursor: pointer;
+      min-width: 140px;
+      transition: all 0.15s;
+    }
+
+    .filter-control:focus {
+      border-color: var(--primary);
+    }
+
+    .filter-control-search {
+      width: 240px;
+    }
+
+    .btn-reset-filters {
+      align-self: flex-end;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 16px;
+      background: none;
+      border: 1.5px dashed var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-reset-filters:hover {
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    .tx-summary-mini {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+
+    .tx-summary-badge {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 8px 16px;
+      border-radius: var(--radius-btn);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tx-summary-badge span {
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===================== SIDEBAR ===================== -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+      </svg>
+    </div>
+    <div class="logo-text">
+      <span class="logo-title">FinanceTrack</span>
+      <span class="logo-sub">Income & Expense Tracker</span>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a href="index.html" class="nav-item" id="nav-dashboard">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+
+    <div class="nav-section-label">TRANSAKSI</div>
+    <a href="transaksi.html" class="nav-item active" id="nav-transaksi">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Transaksi
+    </a>
+    <a href="#" class="nav-item" id="nav-tambah">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      Tambah Transaksi
+    </a>
+    <a href="template.html" class="nav-item" id="nav-template">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 6v12"/><path d="M8 10h8"/><path d="M8 14h8"/></svg>
+      Template Berulang
+    </a>
+    <a href="import.html" class="nav-item" id="nav-import">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Import Excel/CSV
+    </a>
+
+    <div class="nav-section-label">MASTER DATA</div>
+    <a href="kategori.html" class="nav-item" id="nav-kategori">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+      Kategori
+    </a>
+    <a href="project.html" class="nav-item" id="nav-project">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      Project
+    </a>
+    <a href="budget.html" class="nav-item" id="nav-budget">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      Budget
+    </a>
+
+    <div class="nav-section-label">LAPORAN</div>
+    <a href="laporan.html" class="nav-item" id="nav-laporan">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Laporan
+    </a>
+    <a href="#" class="nav-item" id="nav-export">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export PDF/Excel
+    </a>
+
+    <div class="nav-section-label">PENGATURAN</div>
+    <a href="#" class="nav-item" id="nav-pengguna">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Pengguna
+    </a>
+    <a href="#" class="nav-item" id="nav-pengaturan">
+      <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Pengaturan
+    </a>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <div class="dark-mode-toggle">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <span>Dark Mode</span>
+      <div class="toggle-switch active" id="themeToggle" onclick="toggleTheme()">
+        <div class="toggle-thumb"></div>
+      </div>
+    </div>
+    <div class="sidebar-profile">
+      <div class="avatar">JD</div>
+      <div class="profile-info">
+        <span class="profile-name">John Doe</span>
+        <span class="profile-role">Owner</span>
+      </div>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+  </div>
+</aside>
+
+<!-- ===================== MAIN CONTENT ===================== -->
+<div class="main-wrapper">
+
+  <!-- HEADER -->
+  <header class="topbar" id="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" aria-label="Toggle Sidebar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="project-switcher" id="projectSwitcher">
+        <span>Semua Project</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        <div class="project-dropdown" id="projectDropdown">
+          <div class="dropdown-item active">Semua Project</div>
+          <div class="dropdown-item">Project Alpha</div>
+          <div class="dropdown-item">Project Beta</div>
+          <div class="dropdown-item">Project Gamma</div>
+          <div class="dropdown-item">Project Delta</div>
+          <div class="dropdown-item">Project Epsilon</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="topbar-search" id="globalSearchBar" onclick="openSearch()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <span>Cari transaksi, kategori, project...</span>
+      <kbd>Ctrl + K</kbd>
+    </div>
+
+    <div class="topbar-right">
+      <button class="icon-btn notif-btn" id="notifBtn" aria-label="Notifikasi">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="badge">3</span>
+      </button>
+      <button class="icon-btn" id="helpBtn" aria-label="Bantuan">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </button>
+      <div class="header-avatar" id="headerAvatar">JD</div>
+    </div>
+  </header>
+
+  <!-- PAGE CONTENT -->
+  <main class="content" id="mainContent">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Transaksi</h1>
+        <p class="page-sub">Daftar lengkap riwayat pemasukan dan pengeluaran</p>
+      </div>
+      <button class="btn-primary" onclick="openModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Tambah Transaksi
+      </button>
+    </div>
+
+    <!-- FILTER BAR -->
+    <div class="filter-bar">
+      <div class="filter-group">
+        <label for="filterSearch">Cari Deskripsi</label>
+        <input type="text" id="filterSearch" class="filter-control filter-control-search" placeholder="Ketik deskripsi transaksi..." oninput="applyFilters()" />
+      </div>
+      <div class="filter-group">
+        <label for="filterTipe">Tipe</label>
+        <select id="filterTipe" class="filter-control" onchange="applyFilters()">
+          <option value="all">Semua Tipe</option>
+          <option value="income">Pemasukan</option>
+          <option value="expense">Pengeluaran</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="filterProject">Project</label>
+        <select id="filterProject" class="filter-control" onchange="applyFilters()">
+          <option value="all">Semua Project</option>
+          <option value="Project Alpha">Project Alpha</option>
+          <option value="Project Beta">Project Beta</option>
+          <option value="Project Gamma">Project Gamma</option>
+          <option value="Project Delta">Project Delta</option>
+          <option value="Project Epsilon">Project Epsilon</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="filterKategori">Kategori</label>
+        <select id="filterKategori" class="filter-control" onchange="applyFilters()">
+          <option value="all">Semua Kategori</option>
+          <option value="Operasional">Operasional</option>
+          <option value="Marketing">Marketing</option>
+          <option value="Gaji & Upah">Gaji & Upah</option>
+          <option value="Sewa & Listrik">Sewa & Listrik</option>
+          <option value="Transportasi">Transportasi</option>
+          <option value="Penjualan">Penjualan</option>
+          <option value="Jasa">Jasa</option>
+        </select>
+      </div>
+      <button class="btn-reset-filters" onclick="resetAllFilters()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M16 3h5v5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 21H3v-5"/></svg>
+        Reset Filter
+      </button>
+    </div>
+
+    <!-- MINI SUMMARY & TABLE CARD -->
+    <div class="table-card">
+      <div class="tx-summary-mini">
+        <div class="tx-summary-badge">
+          <div class="badge-dot" style="background: var(--success);"></div>
+          Total Pemasukan: <span id="sumIncomeDisplay">Rp 0</span>
+        </div>
+        <div class="tx-summary-badge">
+          <div class="badge-dot" style="background: var(--danger);"></div>
+          Total Pengeluaran: <span id="sumExpenseDisplay">Rp 0</span>
+        </div>
+        <div class="tx-summary-badge">
+          <div class="badge-dot" style="background: var(--primary);"></div>
+          Total Baris: <span id="sumRowsDisplay">0</span>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="tx-table" id="txTable">
+          <thead>
+            <tr>
+              <th>Tanggal</th>
+              <th>Deskripsi</th>
+              <th>Project</th>
+              <th>Kategori</th>
+              <th>Tipe</th>
+              <th>Nominal</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="txTableBody">
+            <!-- Table rows injected dynamically -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination">
+        <span class="page-info" id="paginationInfo">Menampilkan 1-5 transaksi</span>
+        <div class="page-btns">
+          <button class="page-btn" disabled><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ===================== QUICK ADD MODAL ===================== -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOverlay(event)">
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-header">
+      <h2 id="modalTitle">Tambah Transaksi</h2>
+      <button class="modal-close" onclick="closeModal()" aria-label="Tutup modal">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Type Toggle -->
+      <div class="type-toggle" id="typeToggle">
+        <button class="type-btn expense-btn active" id="expenseBtn" onclick="setType('expense')" aria-pressed="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
+          Pengeluaran
+        </button>
+        <button class="type-btn income-btn" id="incomeBtn" onclick="setType('income')" aria-pressed="false">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          Pemasukan
+        </button>
+      </div>
+
+      <form id="txForm" onsubmit="submitForm(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="fKategori">Kategori</label>
+            <select id="fKategori" required>
+              <option value="">Pilih kategori...</option>
+              <option value="operasional">⚙️ Operasional</option>
+              <option value="marketing">📢 Marketing</option>
+              <option value="gaji">👤 Gaji & Upah</option>
+              <option value="sewa">⚡ Sewa & Listrik</option>
+              <option value="transportasi">🚗 Transportasi</option>
+              <option value="penjualan">🛒 Penjualan</option>
+              <option value="jasa">💼 Jasa</option>
+              <option value="lainnya">📦 Lainnya</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="fNominal">Nominal</label>
+            <div class="input-prefix">
+              <span class="prefix-label">Rp</span>
+              <input type="text" id="fNominal" placeholder="0" oninput="formatRupiah(this)" required autocomplete="off" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="fProject">Project</label>
+            <select id="fProject" required>
+              <option value="alpha">Project Alpha</option>
+              <option value="beta">Project Beta</option>
+              <option value="gamma">Project Gamma</option>
+              <option value="delta">Project Delta</option>
+              <option value="epsilon">Project Epsilon</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="fTanggal">Tanggal</label>
+            <input type="date" id="fTanggal" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="fDeskripsi">Deskripsi</label>
+          <input type="text" id="fDeskripsi" placeholder="Deskripsi singkat transaksi..." required />
+        </div>
+
+        <div class="form-group">
+          <label>Attachment (Opsional)</label>
+          <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fFile').click()">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <span>Drag & drop atau klik untuk upload</span>
+            <small>Foto struk / nota — JPG, PNG, PDF</small>
+            <input type="file" id="fFile" accept="image/*,.pdf" style="display:none" capture="environment" />
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" onclick="closeModal()">Batal</button>
+          <button type="submit" class="btn-primary" id="submitBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Simpan Transaksi
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== DETAIL MODAL ===================== -->
+<div class="modal-overlay" id="detailModalOverlay" onclick="closeDetailModalOverlay(event)">
+  <div class="modal" id="detailModal" role="dialog" aria-modal="true" aria-labelledby="detailModalTitle">
+    <div class="modal-header">
+      <h2 id="detailModalTitle">Detail Transaksi</h2>
+      <button class="modal-close" onclick="closeDetailModal()" aria-label="Tutup detail modal">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" style="gap: 16px;">
+      <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+        <span style="font-size: 13px; color: var(--text-muted);">Tanggal Transaksi</span>
+        <span id="dtTanggal" style="font-weight: 600;">-</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+        <span style="font-size: 13px; color: var(--text-muted);">Deskripsi</span>
+        <span id="dtDeskripsi" style="font-weight: 600;">-</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+        <span style="font-size: 13px; color: var(--text-muted);">Project</span>
+        <span id="dtProject" class="project-badge alpha">-</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+        <span style="font-size: 13px; color: var(--text-muted);">Kategori</span>
+        <span id="dtKategori" style="font-weight: 600;">-</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+        <span style="font-size: 13px; color: var(--text-muted);">Tipe</span>
+        <span id="dtTipe" class="type-badge expense-type">-</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+        <span style="font-size: 13px; color: var(--text-muted);">Nominal</span>
+        <span id="dtNominal" style="font-weight: 700; font-size: 16px;">-</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; padding-bottom: 8px;">
+        <span style="font-size: 13px; color: var(--text-muted);">Status</span>
+        <span id="dtStatus" class="status-badge final">-</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== TOAST ===================== -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ===================== SCRIPTS ===================== -->
+<script src="app.js"></script>
+<script>
+  // Mock Data Transaksi Lengkap
+  const ALL_TRANSACTIONS = [
+    { tanggal: '05 Jul 2026 10:23', deskripsi: 'Pembelian ATK Kantor', project: 'Project Alpha', kategori: 'Operasional', emoji: '⚙️', tipe: 'expense', nominal: 250000, status: 'final' },
+    { tanggal: '05 Jul 2026 09:15', deskripsi: 'Penjualan Produk A', project: 'Project Beta', kategori: 'Penjualan', emoji: '🛒', tipe: 'income', nominal: 1500000, status: 'final' },
+    { tanggal: '04 Jul 2026 16:40', deskripsi: 'Biaya Marketing Digital', project: 'Project Gamma', kategori: 'Marketing', emoji: '📢', tipe: 'expense', nominal: 3500000, status: 'pending' },
+    { tanggal: '04 Jul 2026 11:05', deskripsi: 'Jasa Konsultasi IT', project: 'Project Delta', kategori: 'Jasa', emoji: '💼', tipe: 'income', nominal: 5000000, status: 'approved' },
+    { tanggal: '03 Jul 2026 08:30', deskripsi: 'Tagihan Listrik Gudang', project: 'Project Alpha', kategori: 'Sewa & Listrik', emoji: '⚡', tipe: 'expense', nominal: 850000, status: 'final' },
+    { tanggal: '02 Jul 2026 14:10', deskripsi: 'Pembelian Bahan Baku Kayu', project: 'Project Gamma', kategori: 'Operasional', emoji: '⚙️', tipe: 'expense', nominal: 12500000, status: 'approved' },
+    { tanggal: '01 Jul 2026 10:00', deskripsi: 'Pembayaran Gaji Staff Lapangan', project: 'Project Alpha', kategori: 'Gaji & Upah', emoji: '👤', tipe: 'expense', nominal: 15500000, status: 'final' },
+    { tanggal: '30 Jun 2026 17:00', deskripsi: 'Pemasukan Term 1 Proyek Konstruksi', project: 'Project Beta', kategori: 'Penjualan', emoji: '🛒', tipe: 'income', nominal: 20000000, status: 'approved' },
+    { tanggal: '29 Jun 2026 11:20', deskripsi: 'Sewa Kendaraan Operasional', project: 'Project Epsilon', kategori: 'Transportasi', emoji: '🚗', tipe: 'expense', nominal: 600000, status: 'final' }
+  ];
+
+  function renderTransactions(data) {
+    const tbody = document.getElementById('txTableBody');
+    tbody.innerHTML = '';
+    
+    let totalIncome = 0;
+    let totalExpense = 0;
+
+    data.forEach((tx, idx) => {
+      if (tx.tipe === 'income') totalIncome += tx.nominal;
+      else totalExpense += tx.nominal;
+
+      const pClass = tx.project.toLowerCase().replace(' ', '-');
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><span class="tx-date">${tx.tanggal}</span></td>
+        <td><a href="#" class="see-all-link" style="font-size: 13px;" onclick="event.preventDefault(); openDetailModal(${idx})">${tx.deskripsi}</a></td>
+        <td><span class="project-badge ${pClass}">${tx.project}</span></td>
+        <td><span class="category-badge">${tx.emoji} ${tx.kategori}</span></td>
+        <td><span class="type-badge ${tx.tipe}-type">${tx.tipe === 'income' ? '↑ Pemasukan' : '↓ Pengeluaran'}</span></td>
+        <td class="amount-cell ${tx.tipe === 'income' ? 'income' : 'expense'}">${tx.tipe === 'income' ? '+' : '-'}Rp ${tx.nominal.toLocaleString('id-ID')}</td>
+        <td><span class="status-badge ${tx.status}">${tx.status.charAt(0).toUpperCase() + tx.status.slice(1)}</span></td>
+        <td>
+          <div class="action-btns">
+            <button class="action-btn" onclick="showToast('info', 'Fitur edit transaksi mockup')" aria-label="Edit"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+            <button class="action-btn danger" onclick="showToast('error', 'Transaksi berhasil dihapus (mockup)')" aria-label="Hapus"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>
+          </div>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById('sumIncomeDisplay').textContent = 'Rp ' + totalIncome.toLocaleString('id-ID');
+    document.getElementById('sumExpenseDisplay').textContent = 'Rp ' + totalExpense.toLocaleString('id-ID');
+    document.getElementById('sumRowsDisplay').textContent = data.length;
+    document.getElementById('paginationInfo').textContent = `Menampilkan 1-${data.length} dari ${data.length} transaksi`;
+  }
+
+  // Detail Modal Functions
+  function openDetailModal(idx) {
+    const tx = ALL_TRANSACTIONS[idx];
+    if (!tx) return;
+
+    document.getElementById('dtTanggal').textContent = tx.tanggal;
+    document.getElementById('dtDeskripsi').textContent = tx.deskripsi;
+    
+    const pBadge = document.getElementById('dtProject');
+    pBadge.textContent = tx.project;
+    pBadge.className = 'project-badge ' + tx.project.toLowerCase().replace(' ', '-');
+
+    document.getElementById('dtKategori').textContent = tx.emoji + ' ' + tx.kategori;
+    
+    const tBadge = document.getElementById('dtTipe');
+    tBadge.textContent = tx.tipe === 'income' ? '↑ Pemasukan' : '↓ Pengeluaran';
+    tBadge.className = 'type-badge ' + tx.tipe + '-type';
+
+    const amtCell = document.getElementById('dtNominal');
+    amtCell.textContent = (tx.tipe === 'income' ? '+' : '-') + 'Rp ' + tx.nominal.toLocaleString('id-ID');
+    amtCell.className = tx.tipe === 'income' ? 'income' : 'expense';
+
+    const sBadge = document.getElementById('dtStatus');
+    sBadge.textContent = tx.status.charAt(0).toUpperCase() + tx.status.slice(1);
+    sBadge.className = 'status-badge ' + tx.status;
+
+    document.getElementById('detailModalOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeDetailModal() {
+    document.getElementById('detailModalOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function closeDetailModalOverlay(e) {
+    if (e.target === document.getElementById('detailModalOverlay')) {
+      closeDetailModal();
+    }
+  }
+
+  function applyFilters() {
+    const searchVal = document.getElementById('filterSearch').value.toLowerCase();
+    const tipeVal = document.getElementById('filterTipe').value;
+    const projectVal = document.getElementById('filterProject').value;
+    const kategoriVal = document.getElementById('filterKategori').value;
+
+    const filtered = ALL_TRANSACTIONS.filter(tx => {
+      const matchSearch = tx.deskripsi.toLowerCase().includes(searchVal);
+      const matchTipe = tipeVal === 'all' || tx.tipe === tipeVal;
+      const matchProject = projectVal === 'all' || tx.project === projectVal;
+      const matchKategori = kategoriVal === 'all' || tx.kategori === kategoriVal;
+      
+      return matchSearch && matchTipe && matchProject && matchKategori;
+    });
+
+    renderTransactions(filtered);
+  }
+
+  function resetAllFilters() {
+    document.getElementById('filterSearch').value = '';
+    document.getElementById('filterTipe').value = 'all';
+    document.getElementById('filterProject').value = 'all';
+    document.getElementById('filterKategori').value = 'all';
+    renderTransactions(ALL_TRANSACTIONS);
+    showToast('success', 'Filter berhasil direset');
+  }
+
+  // Init
+  document.addEventListener('DOMContentLoaded', () => {
+    renderTransactions(ALL_TRANSACTIONS);
+  });
+</script>
+</body>
+</html>
