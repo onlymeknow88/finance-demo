@@ -564,34 +564,6 @@ function init() {
 
 /* -------------------- ANTI-COPY PROTECTION -------------------- */
 (function() {
-  // 1. Disable Right Click
-  document.addEventListener('contextmenu', e => e.preventDefault());
-
-  // 2. Disable Key Shortcuts (Ctrl+C, Ctrl+U, Ctrl+S, F12 / Ctrl+Shift+I)
-  document.addEventListener('keydown', function(e) {
-    if (
-      e.keyCode === 123 || // F12
-      e.keyCode === 44  || // PrintScreen
-      (e.ctrlKey && e.shiftKey && e.keyCode === 73) || // Ctrl+Shift+I (DevTools)
-      (e.ctrlKey && e.shiftKey && e.keyCode === 74) || // Ctrl+Shift+J (DevTools Console)
-      (e.ctrlKey && e.keyCode === 85) || // Ctrl+U (View Source)
-      (e.ctrlKey && e.keyCode === 83) || // Ctrl+S (Save)
-      (e.ctrlKey && e.keyCode === 67)    // Ctrl+C (Copy)
-    ) {
-      e.preventDefault();
-      showToast('error', '⚠️ Proteksi: Konten dan kode halaman dilindungi!');
-      return false;
-    }
-  });
-
-  // 2b. Block PrintScreen Clipboard copy (Clear clipboard when focus is lost or keyup detected)
-  document.addEventListener('keyup', function(e) {
-    if (e.keyCode === 44) {
-      navigator.clipboard.writeText('');
-      showToast('error', '⚠️ Screenshot Dilarang: Clipboard telah dikosongkan!');
-    }
-  });
-
   // 2c. Blur page when window loses focus or page visibility changes (Snipping tool, OS Multitasking tab switcher on Android/iOS)
   const applyBlur = () => {
     document.body.style.filter = 'blur(15px)';
@@ -602,8 +574,69 @@ function init() {
     document.body.style.filter = 'none';
   };
 
+  // 1. Disable Right Click
+  document.addEventListener('contextmenu', e => e.preventDefault());
+
+  // 2. Disable Key Shortcuts (Ctrl+C, Ctrl+U, Ctrl+S, F12 / Ctrl+Shift+I, Win+Shift+S)
+  let keysPressed = {};
+  
+  document.addEventListener('keydown', function(e) {
+    keysPressed[e.key] = true;
+    
+    // Detect Windows Key + Shift + S
+    const isWinShiftS = (keysPressed['Meta'] || keysPressed['OS']) && keysPressed['Shift'] && (keysPressed['S'] || keysPressed['s']);
+    
+    if (
+      e.keyCode === 123 || // F12
+      e.keyCode === 44  || // PrintScreen
+      isWinShiftS       || // Win + Shift + S
+      (e.ctrlKey && e.shiftKey && e.keyCode === 73) || // Ctrl+Shift+I (DevTools)
+      (e.ctrlKey && e.shiftKey && e.keyCode === 74) || // Ctrl+Shift+J (DevTools Console)
+      (e.ctrlKey && e.keyCode === 85) || // Ctrl+U (View Source)
+      (e.ctrlKey && e.keyCode === 83) || // Ctrl+S (Save)
+      (e.ctrlKey && e.keyCode === 67)    // Ctrl+C (Copy)
+    ) {
+      // Force instant blur
+      applyBlur();
+      e.preventDefault();
+      showToast('error', '⚠️ Proteksi: Konten dan kode halaman dilindungi!');
+      return false;
+    }
+  });
+
+  document.addEventListener('keyup', function(e) {
+    delete keysPressed[e.key];
+  });
+
+  // 2b. Block PrintScreen Clipboard copy (Clear clipboard via copy listener to avoid API permission popups)
+  document.addEventListener('copy', function(e) {
+    e.clipboardData.setData('text/plain', '');
+    e.preventDefault();
+    showToast('error', '⚠️ Proteksi: Penyalinan konten dilarang!');
+  });
+
+  document.addEventListener('keyup', function(e) {
+    if (e.keyCode === 44) {
+      // Trigger a fake copy event or attempt inline selection override to break clipboard content
+      const input = document.createElement('input');
+      input.value = ' ';
+      document.body.appendChild(input);
+      input.select();
+      try {
+        document.execCommand('copy');
+      } catch (err) {}
+      document.body.removeChild(input);
+      showToast('error', '⚠️ Screenshot Dilarang: Clipboard telah dikosongkan!');
+    }
+  });
+
   window.addEventListener('blur', applyBlur);
   window.addEventListener('focus', removeBlur);
+  
+  // Also blur on mouse leaving the window viewport to block snipping pre-activation
+  document.addEventListener('mouseleave', applyBlur);
+  document.addEventListener('mouseenter', removeBlur);
+
   document.addEventListener('visibilitychange', function() {
     if (document.hidden) {
       applyBlur();
