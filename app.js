@@ -615,21 +615,6 @@ function init() {
     showToast('error', '⚠️ Proteksi: Penyalinan konten dilarang!');
   });
 
-  document.addEventListener('keyup', function(e) {
-    if (e.keyCode === 44) {
-      // Trigger a fake copy event or attempt inline selection override to break clipboard content
-      const input = document.createElement('input');
-      input.value = ' ';
-      document.body.appendChild(input);
-      input.select();
-      try {
-        document.execCommand('copy');
-      } catch (err) {}
-      document.body.removeChild(input);
-      showToast('error', '⚠️ Screenshot Dilarang: Clipboard telah dikosongkan!');
-    }
-  });
-
   window.addEventListener('blur', applyBlur);
   window.addEventListener('focus', removeBlur);
   

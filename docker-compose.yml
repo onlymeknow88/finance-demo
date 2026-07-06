@@ -5,5 +5,8 @@ services:
     build: .
     ports:
       - "8089:80"
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
     restart: always
 
